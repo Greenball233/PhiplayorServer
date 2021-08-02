@@ -3,12 +3,15 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.Key;
+import java.sql.SQLException;
 import java.util.Date;
+import java.util.Random;
 import javax.xml.bind.DatatypeConverter;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import io.jsonwebtoken.*;
+import org.apache.commons.lang3.RandomStringUtils;
 
 public class Server extends Thread{
     public ServerSocket server;
@@ -32,8 +35,28 @@ public class Server extends Thread{
                 PrintStream ps = new PrintStream(client.getOutputStream());
                 Gson gson = new Gson();
                 JsonObject text = gson.fromJson(line, JsonObject.class);
-                ps.println(createJWT(text.get("id").getAsString(),"Greenball233","www.phiplayor.org"));
-                ps.flush();
+                String type = text.get("type").getAsString();
+                switch (type) {
+                    case "login":
+                        try {
+                            if (SQL.login(text.get("id").getAsString(),text.get("passwd").getAsString())) {
+                            ps.println(createJWT(text.get("id").getAsString()+text.get("passwd").getAsString(),"Greenball233","www.phiplayor.org"));
+                            } else {
+                                ps.println("loginError");
+                            }
+                            ps.flush();
+                        } catch (ClassNotFoundException | SQLException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case "reg":
+                        Random r = new Random();
+                        String salt = RandomStringUtils.random(r.nextInt(15)+1,"AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789");
+                        break;
+                    default:
+                        ps.println("qwq");
+                        ps.flush();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

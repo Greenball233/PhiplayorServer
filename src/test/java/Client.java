@@ -13,7 +13,7 @@ public class Client {
         try {
             Socket socket = new Socket("localhost",15925);
             PrintStream ps = new PrintStream(socket.getOutputStream());
-            ps.println("{\"id\":\"qwqwq\",\"passwd\":\"test\"}");
+            ps.println("{\"type\":\"login\",\"id\":\"Greenball233\",\"passwd\":\"aaaa\"}");
             ps.flush();
             BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String line = br.readLine();
